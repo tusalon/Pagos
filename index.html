@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RservasRoma — Centro de Conversión</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rosa: #e8478b; --fucsia: #c43275;
+    --rosa-claro: #fef0f5; --rosa-medio: #fcd5e8;
+    --text: #1a1a2e; --muted: #6b7280; --bg: #fff8fc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, var(--fucsia), var(--rosa));
+    color: white; padding: 16px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px; }
+  header p { font-size: 11px; opacity: .8; margin-top: 1px; }
+  .refresh-btn {
+    background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
+    color: white; padding: 7px 14px; border-radius: 20px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+
+  .kpi-bar { display: flex; gap: 10px; padding: 14px 12px; overflow-x: auto; scrollbar-width: none; }
+  .kpi-bar::-webkit-scrollbar { display: none; }
+  .kpi {
+    flex-shrink: 0; background: white; border: 1.5px solid var(--rosa-medio);
+    border-radius: 14px; padding: 12px 16px; min-width: 110px; text-align: center;
+  }
+  .kpi .num { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 26px; color: var(--fucsia); }
+  .kpi .lbl { font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .kpi.highlight { background: var(--fucsia); border-color: var(--fucsia); }
+  .kpi.highlight .num, .kpi.highlight .lbl { color: white; }
+
+  .tabs { display: flex; gap: 6px; padding: 0 12px 10px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0; padding: 7px 13px; border-radius: 20px;
+    border: 2px solid var(--rosa-medio); background: white;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
+    cursor: pointer; color: var(--muted); white-space: nowrap;
+  }
+  .tab.active { background: var(--fucsia); border-color: var(--fucsia); color: white; }
+
+  .search-bar { padding: 0 12px 10px; }
+  .search-bar input {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--rosa-medio);
+    border-radius: 12px; font-size: 14px; color: var(--text); background: white; outline: none;
+  }
+  .search-bar input:focus { border-color: var(--rosa); }
+
+  .cards { padding: 0 12px 80px; }
+
+  .card {
+    background: white; border: 1.5px solid var(--rosa-medio);
+    border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  }
+  .card.contacted { opacity: .5; border-style: dashed; }
+
+  .card-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .card-emoji { font-size: 22px; flex-shrink: 0; padding-top: 2px; }
+  .card-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px; line-height: 1.2; }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .card-email { font-size: 11px; color: var(--muted); margin-top: 2px; word-break: break-all; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip {
+    background: var(--rosa-claro); color: var(--fucsia);
+    border-radius: 8px; padding: 3px 9px; font-size: 11px; font-weight: 700;
+  }
+  .chip.grey { background: #f3f4f6; color: var(--muted); }
+
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-wa {
+    background: #25D366; color: white; border: none; border-radius: 10px;
+    padding: 9px 14px; font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: 13px; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px; flex: 1;
+    justify-content: center;
+  }
+  .btn-done {
+    background: var(--rosa-claro); color: var(--rosa); border: none;
+    border-radius: 10px; padding: 9px 12px; font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 12px; cursor: pointer;
+  }
+  .btn-done.done { background: #d1fae5; color: #065f46; }
+
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
+  .loading { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+  .spinner {
+    width: 30px; height: 30px; border: 3px solid var(--rosa-medio);
+    border-top-color: var(--rosa); border-radius: 50%;
+    animation: spin .8s linear infinite; margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .seg-header {
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+    padding: 8px 0 6px; margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🐾 RservasRoma — Conversiones</h1>
+    <p id="last-update">Cargando...</p>
+  </div>
+  <button class="refresh-btn" onclick="loadData()">↻</button>
+</header>
+
+<div class="kpi-bar">
+  <div class="kpi highlight"><div class="num" id="k-activos">—</div><div class="lbl">Pagando 💰</div></div>
+  <div class="kpi"><div class="num" id="k-trials">—</div><div class="lbl">Trials</div></div>
+  <div class="kpi"><div class="num" id="k-urgente">—</div><div class="lbl">🔥 Urgentes</div></div>
+  <div class="kpi"><div class="num" id="k-total">—</div><div class="lbl">Total negocios</div></div>
+  <div class="kpi"><div class="num" id="k-mrr">—</div><div class="lbl">MRR</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="filterTab('all',this)">Todos</div>
+  <div class="tab" onclick="filterTab('urgente',this)">🔥 Urgente</div>
+  <div class="tab" onclick="filterTab('caliente',this)">⚡ Caliente</div>
+  <div class="tab" onclick="filterTab('tibio',this)">🟡 Tibio</div>
+  <div class="tab" onclick="filterTab('frio',this)">🧊 Frío</div>
+  <div class="tab" onclick="filterTab('fantasma',this)">❌ Fantasma</div>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="🔍 Buscar nombre, teléfono..." oninput="renderCards()">
+</div>
+
+<div class="cards" id="cards">
+  <div class="loading"><div class="spinner"></div>Conectando...</div>
+</div>
+
+<script>
+let allData = [];
+let contactados = JSON.parse(localStorage.getItem('rr_contactados') || '{}');
+let currentTab = 'all';
+
+const MESSAGES = {
+  urgente: (n) => `Hola ${n.nombre.split(' ')[0]} 💖 Veo que llevas ${n.diasTrial} días usando RservasRoma y ya tienes ${n.totalRes} citas gestionadas — eso es increíble 🙌 Quería escribirte personalmente para acompañarte en el siguiente paso. ¿Tienes un momento para hablar?`,
+  caliente: (n) => `Hola ${n.nombre.split(' ')[0]} 💕 Llevas un buen tiempo con RservasRoma y se nota que lo usas (${n.totalRes} citas). Quería conectar contigo y ver cómo te ha ido. ¿Podemos hablar?`,
+  tibio: (n) => `Hola ${n.nombre.split(' ')[0]} 👋 Soy de RservasRoma. Veo que estás probando la app — ¿cómo te ha ido? Si necesitas ayuda para configurarla mejor, aquí estoy 💖`,
+  frio: (n) => `Hola ${n.nombre.split(' ')[0]} 💖 Soy de RservasRoma. Noté que hace tiempo no entras a la app y quería saber si puedo ayudarte a retomar. ¿Qué pasó?`,
+  fantasma: (n) => `Hola ${n.nombre.split(' ')[0]} 👋 Te escribo de RservasRoma. Te registraste pero quizás no tuviste tiempo de configurar tu cuenta. Te ofrezco 10 minutos para ayudarte a empezar. ¿Te viene bien?`
+};
+
+async function loadData() {
+  document.getElementById('cards').innerHTML = '<div class="loading"><div class="spinner"></div>Actualizando...</div>';
+  try {
+    const res = await fetch('/api/data');
+    if (!res.ok) throw new Error('Error ' + res.status);
+    const { suscripciones, activas, negocios, reservas, negociosDetalle } = await res.json();
+
+    const negMap = {};
+    negociosDetalle.forEach(n => negMap[n.id] = n);
+
+    const reservasMap = {}, ultimaMap = {};
+    reservas.forEach(r => {
+      reservasMap[r.negocio_id] = (reservasMap[r.negocio_id] || 0) + 1;
+      if (!ultimaMap[r.negocio_id] || r.created_at > ultimaMap[r.negocio_id])
+        ultimaMap[r.negocio_id] = r.created_at;
+    });
+
+    const now = new Date();
+    allData = suscripciones.map(s => {
+      const n = negMap[s.negocio_id] || {};
+      const totalRes = reservasMap[s.negocio_id] || 0;
+      const ultima = ultimaMap[s.negocio_id];
+      const diasTrial = Math.floor((now - new Date(s.fecha_inicio)) / 86400000);
+      const diasSin = ultima ? Math.floor((now - new Date(ultima)) / 86400000) : 999;
+
+      let prioridad, emoji;
+      if (totalRes > 50 && diasSin <= 7)        { prioridad = 'urgente';  emoji = '🔥'; }
+      else if (totalRes > 20 && diasSin <= 14)  { prioridad = 'caliente'; emoji = '⚡'; }
+      else if (totalRes > 5 && diasSin <= 30)   { prioridad = 'tibio';    emoji = '🟡'; }
+      else if (totalRes > 0)                    { prioridad = 'frio';     emoji = '🧊'; }
+      else                                      { prioridad = 'fantasma'; emoji = '❌'; }
+
+      return { id: s.negocio_id, nombre: n.nombre || 'Sin nombre', telefono: n.telefono || '',
+               email: n.email || '', especialidad: n.especialidad || '', totalRes, diasTrial,
+               diasSin, ultima: ultima ? ultima.split('T')[0] : null, prioridad, emoji };
+    }).sort((a, b) => {
+      const o = { urgente:0, caliente:1, tibio:2, frio:3, fantasma:4 };
+      return o[a.prioridad] !== o[b.prioridad] ? o[a.prioridad]-o[b.prioridad] : b.totalRes-a.totalRes;
+    });
+
+    document.getElementById('k-activos').textContent = activas.length;
+    document.getElementById('k-trials').textContent = suscripciones.length;
+    document.getElementById('k-urgente').textContent = allData.filter(d=>d.prioridad==='urgente').length;
+    document.getElementById('k-total').textContent = negocios.length;
+    document.getElementById('k-mrr').textContent = '$'+(activas.length*2);
+    document.getElementById('last-update').textContent = 'Act. ' + now.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+
+    renderCards();
+  } catch(e) {
+    document.getElementById('cards').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
+  }
+}
+
+function tel(t) {
+  const c = t.replace(/\D/g,'');
+  return c.startsWith('53') ? c : (c.length === 8 ? '53'+c : c);
+}
+
+function toggleContactado(id, btn) {
+  if (contactados[id]) { delete contactados[id]; btn.textContent='✓ Marcar'; btn.classList.remove('done'); btn.closest('.card').classList.remove('contacted'); }
+  else { contactados[id]=true; btn.textContent='✓ Contactado'; btn.classList.add('done'); btn.closest('.card').classList.add('contacted'); }
+  localStorage.setItem('rr_contactados', JSON.stringify(contactados));
+}
+
+function filterTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderCards();
+}
+
+function renderCards() {
+  const search = document.getElementById('search').value.toLowerCase();
+  let data = currentTab === 'all' ? allData : allData.filter(d=>d.prioridad===currentTab);
+  if (search) data = data.filter(d=>d.nombre.toLowerCase().includes(search)||d.telefono.includes(search)||d.email.toLowerCase().includes(search));
+
+  const cont = document.getElementById('cards');
+  if (!data.length) { cont.innerHTML = '<div class="empty">Sin resultados en este segmento.</div>'; return; }
+
+  cont.innerHTML = data.map(n => {
+    const t = tel(n.telefono);
+    const msg = encodeURIComponent(MESSAGES[n.prioridad](n));
+    const done = contactados[n.id];
+    return `
+    <div class="card ${done?'contacted':''}" id="c-${n.id}">
+      <div class="card-top">
+        <div class="card-emoji">${n.emoji}</div>
+        <div>
+          <div class="card-name">${n.nombre}</div>
+          <div class="card-sub">📱 ${n.telefono||'—'} · ${n.especialidad||'—'}</div>
+          <div class="card-email">✉️ ${n.email||'—'}</div>
+        </div>
+      </div>
+      <div class="chips">
+        <div class="chip">${n.totalRes} reservas</div>
+        <div class="chip">${n.diasTrial}d en trial</div>
+        <div class="chip grey">Última: ${n.ultima||'nunca'}</div>
+        ${n.diasSin<999?`<div class="chip grey">${n.diasSin}d inactivo</div>`:''}
+      </div>
+      <div class="card-actions">
+        ${n.telefono?`<a class="btn-wa" href="https://wa.me/${t}?text=${msg}" target="_blank">💬 WhatsApp</a>`:''}
+        <button class="btn-done ${done?'done':''}" onclick="toggleContactado('${n.id}',this)">${done?'✓ Contactado':'✓ Marcar'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+loadData();
+setInterval(loadData, 5 * 60 * 1000);
+</script>
+</body>
+</html>
